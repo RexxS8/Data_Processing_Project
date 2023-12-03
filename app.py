@@ -47,7 +47,14 @@ if uploaded_file is not None:
     st.write(df)
 
     # Menu for data processing methods
-    selected_method = st.selectbox("Select Data Processing Method:", ["Shape", "Information", "Describe", "Unique", "Boxplot", "One-Hot Encoding", "Check Missing Values", "Histogram Comparison"])
+    selected_method = st.selectbox("Select Data Processing Method:", ["Shape",
+                                                                      "Information",
+                                                                      "Describe",
+                                                                      "Unique",
+                                                                      "Boxplot",
+                                                                      "One-Hot Encoding",
+                                                                      "Check Missing Values",
+                                                                      "Histogram Comparison"])
 
     # Check if "Boxplot" is selected
     if selected_method == "Boxplot":

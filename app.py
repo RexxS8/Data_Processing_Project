@@ -47,7 +47,7 @@ if uploaded_file is not None:
     st.write(df)
 
     # Menu for data processing methods
-    selected_method = st.selectbox("Select Data Processing Method:", ["Shape", "Information", "Describe", "Unique", "Boxplot", "One-Hot Encoding"])
+    selected_method = st.selectbox("Select Data Processing Method:", ["Shape", "Information", "Describe", "Unique", "Boxplot", "One-Hot Encoding", "Check Missing Values", "Histogram Comparison"])
 
     # Check if "Boxplot" is selected
     if selected_method == "Boxplot":
@@ -58,9 +58,12 @@ if uploaded_file is not None:
         if pd.api.types.is_numeric_dtype(df[selected_column]):
             # Display the Boxplot
             st.write(f"Boxplot for {selected_column}:")
-            fig, ax = plt.subplots()
-            sns.boxplot(x=selected_column, data=df, ax=ax)
-            st.pyplot(fig)
+            # Button to generate Boxplot
+            generate_boxplot = st.button("Generate Boxplot")
+            if generate_boxplot:
+                fig, ax = plt.subplots()
+                sns.boxplot(x=selected_column, data=df, ax=ax)
+                st.pyplot(fig)
         else:
             st.warning(f"Selected column '{selected_column}' is not numeric and cannot be used for Boxplot.")
 
@@ -69,12 +72,35 @@ if uploaded_file is not None:
         # Allow user to select a column for one-hot encoding
         selected_column = st.selectbox("Select a column for One-Hot Encoding:", df.columns)
 
-        # Perform one-hot encoding if the column is object type
-        df = onehot_encode_column(df, selected_column)
+        # Button to perform One-Hot Encoding
+        onehot_encode_button = st.button("Perform One-Hot Encoding")
+        if onehot_encode_button:
+            # Perform one-hot encoding if the column is object type
+            df = onehot_encode_column(df, selected_column)
+            # Display the updated DataFrame
+            st.write(f"One-Hot Encoding for {selected_column}:")
+            st.write(df)
 
-        # Display the updated DataFrame
-        st.write(f"One-Hot Encoding for {selected_column}:")
-        st.write(df)
+    # Check if "Histogram Comparison" is selected
+    elif selected_method == "Histogram Comparison":
+        # Allow user to select a column for histogram
+        selected_column_a = st.selectbox("Select a column for histogram:", df.columns)
+
+        # Allow user to select a column for 'hue' (optional)
+        hue_column = st.selectbox("Select a column for 'hue' (optional):", [None] + list(df.columns))
+
+        # Button to generate Histogram Comparison
+        generate_histogram_comparison = st.button("Generate Histogram Comparison")
+        if generate_histogram_comparison:
+            # Display the histogram comparison
+            st.write(f"Histogram Comparison for {selected_column_a} with 'hue' by {hue_column if hue_column else 'None'}:")
+            fig, ax = plt.subplots(figsize=(10, 8))
+            if hue_column:
+                sns.histplot(df, x=selected_column_a, kde=True, hue=hue_column, multiple='stack', ax=ax)
+            else:
+                sns.histplot(df[selected_column_a], label=selected_column_a, kde=True)
+            ax.legend()
+            st.pyplot(fig)
 
     else:
         # Button to trigger data processing
@@ -89,7 +115,12 @@ if uploaded_file is not None:
             elif selected_method == "Information":
                 # Display DataFrame information directly
                 st.write("DataFrame Information:")
-                st.write(df.info())
+                # Create a string with information
+                info_str = f"Shape of DataFrame: {df.shape}\n"
+                info_str += f"Data types:\n{df.dtypes}\n"
+                info_str += f"Non-null counts:\n{df.count()}\n"
+                # Display the information string
+                st.text(info_str)
             elif selected_method == "Describe":
                 # Display DataFrame information directly
                 st.write("DataFrame Information:")
@@ -98,3 +129,7 @@ if uploaded_file is not None:
                 # Display DataFrame information directly
                 st.write("DataFrame Information:")
                 st.write(df.nunique())
+            elif selected_method == "Check Missing Values":
+                # Display missing values for each column
+                st.write("Missing Values:")
+                st.write(df.isnull().sum())

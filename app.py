@@ -2,7 +2,6 @@
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
-import numpy as np
 import seaborn as sns
 
 # Function for one-hot encoding
@@ -25,13 +24,30 @@ st.title("Data Processing Project")
 
 # Penjelasan proyek
 st.markdown("""
-    Perkenalkan ini adalah web yang menampilkan data processing yang kami buat.
-    
-    **Kelompok ini beranggotakan:**
-    - Rhena Tabella - 064002200004
-    - Andri Martin - 064002200010
-    - Muhammad Ziddan Fadillah - 064002200025
-    - Muhammad Fahmi - 064002200036
+    Selamat datang di Web Data Processing!
+
+    **Kami adalah tim yang berdedikasi untuk membantu Anda memproses dan menganalisis data dengan mudah. Tim ini terdiri dari:**
+
+    - Rhena Tabella (NIM: 064002200004)
+    - Andri Martin (NIM: 064002200010)
+    - Muhammad Ziddan Fadillah (NIM: 064002200025)
+    - Muhammad Fahmi (NIM: 064002200036)
+
+    Cara Penggunaan:
+
+    - **Upload File CSV:**
+      Silakan unggah file CSV Anda dengan menggunakan tombol di bawah.
+      
+    - **Pilih Metode:**
+      Pilih metode pemrosesan data dari menu drop-down, seperti "Shape", "Information", "Boxplot", dan lainnya.
+      
+    - **Analisis Data:**
+      Lakukan analisis data dengan menekan tombol yang sesuai. Misalnya, tekan "Generate Boxplot" untuk membuat boxplot.
+      
+    - **Hasil dan Informasi:**
+      Hasil analisis dan informasi akan ditampilkan secara interaktif di bawahnya.
+      
+    Semoga alat ini membantu Anda menjelajahi dan memahami data Anda dengan lebih baik. Jangan ragu untuk menghubungi kami jika Anda memiliki pertanyaan atau masukan!
 """)
 
 # Upload CSV file
@@ -51,10 +67,10 @@ if uploaded_file is not None:
                                                                       "Information",
                                                                       "Describe",
                                                                       "Unique",
+                                                                      "Check Missing Values",
                                                                       "Boxplot",
                                                                       "One-Hot Encoding",
-                                                                      "Check Missing Values",
-                                                                      "Histogram Comparison"])
+                                                                      "Histogram Countplot"])
 
     # Check if "Boxplot" is selected
     if selected_method == "Boxplot":
@@ -88,26 +104,54 @@ if uploaded_file is not None:
             st.write(f"One-Hot Encoding for {selected_column}:")
             st.write(df)
 
-    # Check if "Histogram Comparison" is selected
-    elif selected_method == "Histogram Comparison":
+    # Check if "Histogram Countplot" is selected
+    elif selected_method == "Histogram Countplot":
         # Allow user to select a column for histogram
         selected_column_a = st.selectbox("Select a column for histogram:", df.columns)
 
         # Allow user to select a column for 'hue' (optional)
         hue_column = st.selectbox("Select a column for 'hue' (optional):", [None] + list(df.columns))
 
-        # Button to generate Histogram Comparison
-        generate_histogram_comparison = st.button("Generate Histogram Comparison")
-        if generate_histogram_comparison:
-            # Display the histogram comparison
-            st.write(f"Histogram Comparison for {selected_column_a} with 'hue' by {hue_column if hue_column else 'None'}:")
+        # Button to generate Histogram Countplot
+        generate_histogram_countplot = st.button("Generate Histogram Countplot")
+        if generate_histogram_countplot:
+            # Display the histogram countplot
+            st.write(f"Histogram Countplot for {selected_column_a} with 'hue' by {hue_column if hue_column else 'None'}:")
             fig, ax = plt.subplots(figsize=(10, 8))
+
             if hue_column:
-                sns.histplot(df, x=selected_column_a, kde=True, hue=hue_column, multiple='stack', ax=ax)
+                plot = sns.countplot(x=selected_column_a, data=df, hue=hue_column)
             else:
-                sns.histplot(df[selected_column_a], label=selected_column_a, kde=True)
+                plot = sns.countplot(x=selected_column_a, data=df)
+
+            # Add count labels on top of each bar
+            for p in plot.patches:
+                count_label = p.get_height()
+                x_position = p.get_x() + p.get_width() / 2
+                y_position = p.get_height() + 0.05  # Adjust the vertical position of the count label
+                ax.annotate(count_label, (x_position, y_position), ha='center', va='center')
+
             ax.legend()
             st.pyplot(fig)
+    
+    # Check if "Check Missing Values" is selected
+    elif selected_method == "Check Missing Values":
+        # Display missing values for each column
+        st.write("Missing Values:")
+        missing_values = df.isnull().sum()
+        st.write(missing_values)
+        # Check if there are missing values
+        if missing_values.sum() == 0:
+            st.info("No missing values found. No need to drop rows.")
+        else:
+            # Button to drop rows with missing values and proceed to "Cleaned Data"
+            drop_missing_values_button = st.button("Drop Rows with Missing Values and Proceed to Cleaned Data")
+            if drop_missing_values_button:
+                # Drop rows with missing values
+                df_cleaned = df.dropna()
+                # Display the cleaned DataFrame
+                st.write("Data after dropping rows with missing values:")
+                st.write(df_cleaned)
 
     else:
         # Button to trigger data processing
@@ -136,7 +180,3 @@ if uploaded_file is not None:
                 # Display DataFrame information directly
                 st.write("DataFrame Information:")
                 st.write(df.nunique())
-            elif selected_method == "Check Missing Values":
-                # Display missing values for each column
-                st.write("Missing Values:")
-                st.write(df.isnull().sum())

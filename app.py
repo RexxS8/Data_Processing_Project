@@ -28,10 +28,10 @@ st.markdown("""
 
     **Kami adalah tim yang berdedikasi untuk membantu Anda memproses dan menganalisis data dengan mudah. Tim ini terdiri dari:**
 
-    - Rhena Tabella (NIM: 064002200004)
-    - Andri Martin (NIM: 064002200010)
-    - Muhammad Ziddan Fadillah (NIM: 064002200025)
-    - Muhammad Fahmi (NIM: 064002200036)
+    - Rhena Tabella - 064002200004
+    - Andri Martin - 064002200010
+    - Muhammad Ziddan Fadillah - 064002200025
+    - Muhammad Fahmi - 064002200036
 
     Cara Penggunaan:
 
